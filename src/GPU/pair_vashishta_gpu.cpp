@@ -14,7 +14,7 @@
 /* ----------------------------------------------------------------------
    Contributing author: Mike Brown (ORNL)
 ------------------------------------------------------------------------- */
-
+#include <limits>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -156,7 +156,7 @@ void PairVashishtaGPU::init_style()
   if (force->newton_pair != 0)
     error->all(FLERR,"Pair style vashishta/gpu requires newton pair off");
 
-  double *cutsq, *r0, *gamma, *eta;
+  double *cutsq, *r0, *r0eps, *gamma, *eta;
   double *lam1inv, *lam4inv, *zizj, *mbigd;
   double *dvrc, *big6w, *heta, *bigh;
   double *bigw, *c0, *costheta, *bigb;
@@ -180,7 +180,7 @@ void PairVashishtaGPU::init_style()
   bigb = NULL;
   big2b = NULL;
   bigc = NULL;
-
+  
   memory->create(cutsq,nparams,"pair:cutsq");
   memory->create(r0,nparams,"pair:r0");
   memory->create(gamma,nparams,"pair:gamma");

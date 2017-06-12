@@ -41,7 +41,6 @@ int vashishta_gpu_init(const int ntypes, const int inum, const int nall, const i
                 const double* bigw, const double* c0,
                 const double* costheta, const double* bigb,
                 const double* big2b, const double* bigc) {
-  cout << "Will do init in here" << endl;
   VashishtaMF.clear();
   gpu_mode=VashishtaMF.device->gpu_mode();
   double gpu_split=VashishtaMF.device->particle_split();
@@ -68,7 +67,7 @@ int vashishta_gpu_init(const int ntypes, const int inum, const int nall, const i
 
   int init_ok=0;
   if (world_me==0)
-    init_ok=VashishtaMF.init(ntypes, inum, nall, 300, cell_size, gpu_split, screen,
+    init_ok=VashishtaMF.init(ntypes, inum, nall, 500, cell_size, gpu_split, screen,
                       host_map, nelements, host_elem2param, nparams,
                       cutsq, r0, gamma, eta, lam1inv, 
                       lam4inv, zizj, mbigd, dvrc, big6w, heta, bigh, bigw, 
@@ -88,7 +87,7 @@ int vashishta_gpu_init(const int ntypes, const int inum, const int nall, const i
       fflush(screen);
     }
     if (gpu_rank==i && world_me!=0)
-      init_ok=VashishtaMF.init(ntypes, inum, nall, 300, cell_size, gpu_split, screen,
+      init_ok=VashishtaMF.init(ntypes, inum, nall, 500, cell_size, gpu_split, screen,
                         host_map, nelements, host_elem2param, nparams,
                         cutsq, r0, gamma, eta, lam1inv, 
                         lam4inv, zizj, mbigd, dvrc, big6w, heta, bigh, bigw, 

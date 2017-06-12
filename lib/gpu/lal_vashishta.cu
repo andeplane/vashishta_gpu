@@ -255,14 +255,14 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
 {                                                                            \
   numtyp r1 = ucl_sqrt(rsq1);                                                \
   numtyp rinvsq1 = ucl_recip(rsq1);                                          \
-  numtyp rainv1 = ucl_recip(r1 - sw_r0_ij);                                  \
+  numtyp rainv1 = ucl_recip(r1 - sw_r0_ij);                               \
   numtyp gsrainv1 = sw_gamma_ij * rainv1;                                    \
   numtyp gsrainvsq1 = gsrainv1*rainv1/r1;                                    \
   numtyp expgsrainv1 = ucl_exp(gsrainv1);                                    \
                                                                              \
   numtyp r2 = ucl_sqrt(rsq2);                                                \
   numtyp rinvsq2 = ucl_recip(rsq2);                                          \
-  numtyp rainv2 = ucl_recip(r2 - sw_r0_ik);                                  \
+  numtyp rainv2 = ucl_recip(r2 - sw_r0_ik);                               \
   numtyp gsrainv2 = sw_gamma_ik * rainv2;                                    \
   numtyp gsrainvsq2 = gsrainv2*rainv2/r2;                                    \
   numtyp expgsrainv2 = ucl_exp(gsrainv2);                                    \
@@ -311,13 +311,13 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
 {                                                                            \
   numtyp r1 = ucl_sqrt(rsq1);                                                \
   numtyp rinvsq1 = ucl_recip(rsq1);                                          \
-  numtyp rainv1 = ucl_recip(r1 - sw_r0_ij);                                  \
+  numtyp rainv1 = ucl_recip(r1 - sw_r0_ij);                               \
   numtyp gsrainv1 = sw_gamma_ij * rainv1;                                    \
   numtyp gsrainvsq1 = gsrainv1*rainv1/r1;                                    \
   numtyp expgsrainv1 = ucl_exp(gsrainv1);                                    \
                                                                              \
   numtyp r2 = ucl_sqrt(rsq2);                                                \
-  numtyp rainv2 = ucl_recip(r2 - sw_r0_ik);                                  \
+  numtyp rainv2 = ucl_recip(r2 - sw_r0_ik);                               \
   numtyp gsrainv2 = sw_gamma_ik * rainv2;                                    \
   numtyp expgsrainv2 = ucl_exp(gsrainv2);                                    \
                                                                              \
@@ -361,7 +361,7 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
                                 const int t_per_atom, const int evatom) {
   __local int tpa_sq, n_stride;
   tpa_sq=fast_mul(t_per_atom,t_per_atom);
-  numtyp sw_gamma_ij, sw_r0_ij, sw_gamma_ik, sw_r0_ik;
+  numtyp sw_gamma_ij, sw_r0sq_ij, sw_r0_ij, sw_gamma_ik, sw_r0sq_ik, sw_r0_ik;
   numtyp sw_costheta_ijk, sw_bigc_ijk, sw_bigb_ijk, sw_big2b_ijk;
 
   int tid, ii, offset;
@@ -406,9 +406,10 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
       int ijparam=elem2param[itype*nelements*nelements+jtype*nelements+jtype];
       
       numtyp4 sw4_ijparam; fetch4(sw4_ijparam,ijparam,sw4_tex);
-      sw_r0_ij=sw4_ijparam.x;
-      if (rsq1 > sw_r0_ij*sw_r0_ij) continue;
+      sw_r0sq_ij=sw4_ijparam.x;
+      if (rsq1 > sw_r0sq_ij) continue;
       sw_gamma_ij=sw4_ijparam.y;
+      sw_r0_ij=sw4_ijparam.w;
       
       int nbor_k=nbor_j-offset_j+offset_k;
       if (nbor_k<=nbor_j)
@@ -428,10 +429,11 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
         numtyp delr2y = kx.y-ix.y;
         numtyp delr2z = kx.z-ix.z;
         numtyp rsq2 = delr2x*delr2x + delr2y*delr2y + delr2z*delr2z;
-        if (rsq2 < sw4_ikparam.x*sw4_ikparam.x) {
-          numtyp4 sw4_ikparam; fetch4(sw4_ikparam,ikparam,sw4_tex);
+
+        sw_r0sq_ik=sw4_ikparam.x;
+        if (rsq2 < sw_r0sq_ik) {
           sw_gamma_ik=sw4_ikparam.y;
-          sw_r0_ik=sw4_ikparam.x;
+          sw_r0_ik=sw4_ikparam.w;
 
           int ijkparam=elem2param[itype*nelements*nelements+jtype*nelements+ktype];
           numtyp4 sw5_ijkparam; fetch4(sw5_ijkparam,ijkparam,sw5_tex);
@@ -484,7 +486,7 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
                              const int t_per_atom, const int gpu_nbor) {
   __local int tpa_sq, n_stride;
   tpa_sq=fast_mul(t_per_atom,t_per_atom);
-  numtyp sw_gamma_ij, sw_r0_ij, sw_gamma_ik, sw_r0_ik;
+  numtyp sw_gamma_ij, sw_r0sq_ij, sw_r0_ij, sw_gamma_ik, sw_r0sq_ik, sw_r0_ik;
   numtyp sw_costheta_ijk, sw_bigc_ijk, sw_bigb_ijk, sw_big2b_ijk;
 
   int tid, ii, offset;
@@ -527,10 +529,11 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
 
       int ijparam=elem2param[itype*nelements*nelements+jtype*nelements+jtype];
       numtyp4 sw4_ijparam; fetch4(sw4_ijparam,ijparam,sw4_tex);
-      sw_r0_ij = sw4_ijparam.x;
-      if (rsq1 > sw_r0_ij*sw_r0_ij) continue;
+      sw_r0sq_ij = sw4_ijparam.x;
+      if (rsq1 > sw_r0sq_ij) continue;
 
       sw_gamma_ij=sw4_ijparam.y;
+      sw_r0_ij = sw4_ijparam.w;
       
       int nbor_k,numk;
       if (dev_nbor==dev_packed) {
@@ -565,10 +568,11 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
         numtyp delr2z = kx.z - jx.z;
         numtyp rsq2 = delr2x*delr2x + delr2y*delr2y + delr2z*delr2z;
         numtyp4 sw4_ikparam; fetch4(sw4_ikparam,ikparam,sw4_tex);
-        sw_r0_ik=sw4_ikparam.x;
+        sw_r0sq_ik=sw4_ikparam.x;
 
-        if (rsq2 < sw_r0_ik*sw_r0_ik) {
+        if (rsq2 < sw_r0sq_ik) {
           sw_gamma_ik=sw4_ikparam.y;
+          sw_r0_ik=sw4_ikparam.w;
           
           int ijkparam=elem2param[jtype*nelements*nelements+itype*nelements+ktype]; //jik
           numtyp4 sw5_ijkparam; fetch4(sw5_ijkparam,ijkparam,sw5_tex);
@@ -621,7 +625,7 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
                              const int t_per_atom, const int gpu_nbor) {
   __local int tpa_sq, n_stride;
   tpa_sq=fast_mul(t_per_atom,t_per_atom);
-  numtyp sw_gamma_ij, sw_r0_ij, sw_gamma_ik, sw_r0_ik;
+  numtyp sw_gamma_ij, sw_r0sq_ij, sw_r0_ij, sw_gamma_ik, sw_r0sq_ik, sw_r0_ik;
   numtyp sw_costheta_ijk, sw_bigc_ijk, sw_bigb_ijk, sw_big2b_ijk;
 
   int tid, ii, offset;
@@ -664,10 +668,11 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
 
       int ijparam=elem2param[itype*nelements*nelements+jtype*nelements+jtype];
       numtyp4 sw4_ijparam; fetch4(sw4_ijparam,ijparam,sw4_tex);
-      sw_r0_ij=sw4_ijparam.x;
-      if (rsq1 > sw_r0_ij*sw_r0_ij) continue;
+      sw_r0sq_ij=sw4_ijparam.x;
+      if (rsq1 > sw_r0sq_ij) continue;
 
       sw_gamma_ij=sw4_ijparam.y;
+      sw_r0_ij=sw4_ijparam.w;
       
       int nbor_k,numk;
       if (dev_nbor==dev_packed) {
@@ -702,10 +707,11 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
         numtyp delr2y = kx.y - jx.y;
         numtyp delr2z = kx.z - jx.z;
         numtyp rsq2 = delr2x*delr2x + delr2y*delr2y + delr2z*delr2z;
-        sw_r0_ik=sw4_ikparam.x;
+        sw_r0sq_ik=sw4_ikparam.x;
 
-        if (rsq2 < sw_r0_ik*sw_r0_ik) {
+        if (rsq2 < sw_r0sq_ik) {
           sw_gamma_ik=sw4_ikparam.y;
+          sw_r0_ik=sw4_ikparam.w;
 
           int ijkparam=elem2param[jtype*nelements*nelements+itype*nelements+ktype]; // jik
           numtyp4 sw5_ijkparam; fetch4(sw5_ijkparam,ijkparam,sw5_tex);

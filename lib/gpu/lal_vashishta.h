@@ -40,7 +40,7 @@ class Vashishta : public BaseThree<numtyp, acctyp> {
   int init(const int ntypes, const int nlocal, const int nall, const int max_nbors,
            const double cell_size, const double gpu_split, FILE *screen,
            int* host_map, const int nelements, int*** host_elem2param, const int nparams,
-           const double* cutsq, const double* r0,
+           const double* cutsq, const double* r0, 
            const double* gamma, const double* eta,
            const double* lam1inv, const double* lam4inv,
            const double* zizj, const double* mbigd,

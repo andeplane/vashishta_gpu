@@ -130,10 +130,12 @@ int VashishtaT::init(const int ntypes, const int nlocal, const int nall, const i
   sw4.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
 
   for (int i=0; i<nparams; i++) {
-    dview[i].x=static_cast<numtyp>(r0[i]);
+    double r0sq = r0[i]*r0[i]-1e-4; // TODO: should we have the 1e-4?
+
+    dview[i].x=static_cast<numtyp>(r0sq);
     dview[i].y=static_cast<numtyp>(gamma[i]);
     dview[i].z=static_cast<numtyp>(cutsq[i]);
-    dview[i].w=static_cast<numtyp>(bigc[i]);
+    dview[i].w=static_cast<numtyp>(r0[i]);
   }
 
   ucl_copy(sw4,dview,false);
