@@ -66,9 +66,6 @@ double vashishta_gpu_bytes();
 extern double lmp_gpu_forces(double **f, double **tor, double *eatom,
                              double **vatom, double *virial, double &ecoul);
 
-#define MAXLINE 1024
-#define DELTA 4
-
 /* ---------------------------------------------------------------------- */
 
 PairVashishtaGPU::PairVashishtaGPU(LAMMPS *lmp) : PairVashishta(lmp), gpu_mode(GPU_FORCE)
@@ -160,24 +157,11 @@ void PairVashishtaGPU::init_style()
   double *bigw, *c0, *costheta, *bigb;
   double *big2b, *bigc;
 
-  cutsq = NULL;
-  r0 = NULL;
-  gamma = NULL;
-  eta = NULL;
-  lam1inv = NULL;
-  lam4inv = NULL;
-  zizj = NULL;
-  mbigd = NULL;
-  dvrc = NULL;
-  big6w = NULL;
-  heta = NULL;
-  bigh = NULL;
-  bigw = NULL;
-  c0 = NULL;
-  costheta = NULL;
-  bigb = NULL;
-  big2b = NULL;
-  bigc = NULL;
+  cutsq = r0 = gamma = eta = NULL;
+  lam1inv = lam4inv = zizj = mbigd = NULL;
+  dvrc = big6w = heta = bigh = NULL;
+  bigw = c0 = costheta = bigb = NULL;
+  big2b = bigc = NULL;
   
   memory->create(cutsq,nparams,"pair:cutsq");
   memory->create(r0,nparams,"pair:r0");
