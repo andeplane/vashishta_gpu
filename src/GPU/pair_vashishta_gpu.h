@@ -53,11 +53,11 @@ E: Insufficient memory on accelerator
 There is insufficient memory on one of the devices specified for the gpu
 package
 
-E: Pair style sw/gpu requires atom IDs
+E: Pair style vashishta/gpu requires atom IDs
 
 This is a requirement to use this potential.
 
-E: Pair style sw/gpu requires newton pair off
+E: Pair style vashishta/gpu requires newton pair off
 
 See the newton command.  This is a restriction to use this potential.
 

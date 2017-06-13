@@ -1,7 +1,7 @@
 // **************************************************************************
-//                                   sw.cu
+//                                 vashishta.cu
 //                             -------------------
-//                           W. Michael Brown (ORNL)
+//                           Anders Hafreager (UiO)
 //
 //  Device code for acceleration of the sw pair style
 //
@@ -9,13 +9,12 @@
 //    This file is part of the LAMMPS Accelerator Library (LAMMPS_AL)
 // __________________________________________________________________________
 //
-//    begin                : Tue March 26, 2013
-//    email                : brownw@ornl.gov
+//    begin                : Mon June 12, 2017
+//    email                : andershaf@gmail.com
 // ***************************************************************************/
 
 #ifdef NV_KERNEL
 #include "lal_aux_fun1.h"
-#include <cstdio>
 
 #ifndef _DOUBLE_DOUBLE
 texture<float4> pos_tex;

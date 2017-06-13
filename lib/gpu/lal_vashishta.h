@@ -1,7 +1,7 @@
 /***************************************************************************
-                                    sw.h
+                                vashishta.h
                              -------------------
-                            W. Michael Brown (ORNL)
+                            Anders Hafreager (UiO9)
 
   Class for acceleration of the sw pair style.
 
@@ -9,8 +9,8 @@
     This file is part of the LAMMPS Accelerator Library (LAMMPS_AL)
  __________________________________________________________________________
 
-    begin                : Tue March 26, 2013
-    email                : brownw@ornl.gov
+    begin                : Mon June 12, 2017
+    email                : andershaf@gmail.com
  ***************************************************************************/
 
 #ifndef LAL_VASHISHTA_H

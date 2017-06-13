@@ -12,7 +12,7 @@
 ------------------------------------------------------------------------- */
 
 /* ----------------------------------------------------------------------
-   Contributing author: Mike Brown (ORNL)
+   Contributing author: Anders Hafreager (UiO)
 ------------------------------------------------------------------------- */
 #include <limits>
 #include <math.h>
@@ -32,8 +32,6 @@
 #include "error.h"
 #include "domain.h"
 #include "gpu_extra.h"
-#include <iostream>
-using namespace std;
 
 using namespace LAMMPS_NS;
 

@@ -1,7 +1,7 @@
 /***************************************************************************
-                                   sw.cpp
+                                vashishta.cpp
                              -------------------
-                            W. Michael Brown (ORNL)
+                            Anders Hafreager (UiO)
 
   Class for acceleration of the sw pair style.
 
