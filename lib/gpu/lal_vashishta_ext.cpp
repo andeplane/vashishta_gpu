@@ -1,9 +1,9 @@
 /***************************************************************************
                               vashishta_ext.cpp
                              -------------------
-                            Anders Hafreager (UiO9)
+                            Anders Hafreager (UiO)
 
-  Class for acceleration of the sw pair style.
+  Class for acceleration of the vashishta pair style.
 
  __________________________________________________________________________
     This file is part of the LAMMPS Accelerator Library (LAMMPS_AL)

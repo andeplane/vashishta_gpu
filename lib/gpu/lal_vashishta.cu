@@ -18,27 +18,27 @@
 
 #ifndef _DOUBLE_DOUBLE
 texture<float4> pos_tex;
-texture<float4> sw1_tex;
-texture<float4> sw2_tex;
-texture<float4> sw3_tex;
-texture<float4> sw4_tex;
-texture<float4> sw5_tex;
+texture<float4> param1_tex;
+texture<float4> param2_tex;
+texture<float4> param3_tex;
+texture<float4> param4_tex;
+texture<float4> param5_tex;
 #else
 texture<int4,1> pos_tex;
-texture<int4> sw1_tex;
-texture<int4> sw2_tex;
-texture<int4> sw3_tex;
-texture<int4> sw4_tex;
-texture<int4> sw5_tex;
+texture<int4> param1_tex;
+texture<int4> param2_tex;
+texture<int4> param3_tex;
+texture<int4> param4_tex;
+texture<int4> param5_tex;
 #endif
 
 #else
 #define pos_tex x_
-#define sw1_tex sw1
-#define sw2_tex sw2
-#define sw3_tex sw3
-#define sw3_tex sw4
-#define sw3_tex sw5
+#define param1_tex param1
+#define param2_tex param2
+#define param3_tex param3
+#define param3_tex param4
+#define param3_tex param5
 #endif
 
 #define THIRD (numtyp)0.66666666666666666667
@@ -138,11 +138,11 @@ texture<int4> sw5_tex;
 
 
 __kernel void k_vashishta(const __global numtyp4 *restrict x_,
-                   const __global numtyp4 *restrict sw1,
-                   const __global numtyp4 *restrict sw2,
-                   const __global numtyp4 *restrict sw3,
-                   const __global numtyp4 *restrict sw4,
-                   const __global numtyp4 *restrict sw5,
+                   const __global numtyp4 *restrict param1,
+                   const __global numtyp4 *restrict param2,
+                   const __global numtyp4 *restrict param3,
+                   const __global numtyp4 *restrict param4,
+                   const __global numtyp4 *restrict param5,
                    const __global int *restrict map,
                    const __global int *restrict elem2param,
                    const int nelements,
@@ -192,46 +192,46 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
       numtyp delz = ix.z-jx.z;
       numtyp rsq = delx*delx+dely*dely+delz*delz;
 
-      if (rsq<sw4[ijparam].z) { // cutsq = sw4[ijparam].z
-        numtyp4 sw1_ijparam; fetch4(sw1_ijparam,ijparam,sw1_tex);
-        numtyp sw1_eta=sw1_ijparam.x;
-        numtyp sw1_lam1inv=sw1_ijparam.y;
-        numtyp sw1_lam4inv=sw1_ijparam.z;
-        numtyp sw1_zizj=sw1_ijparam.w;
+      if (rsq<param4[ijparam].z) { // cutsq = param4[ijparam].z
+        numtyp4 param1_ijparam; fetch4(param1_ijparam,ijparam,param1_tex);
+        numtyp param1_eta=param1_ijparam.x;
+        numtyp param1_lam1inv=param1_ijparam.y;
+        numtyp param1_lam4inv=param1_ijparam.z;
+        numtyp param1_zizj=param1_ijparam.w;
 
-        numtyp4 sw2_ijparam; fetch4(sw2_ijparam,ijparam,sw2_tex);
-        numtyp sw2_mbigd=sw2_ijparam.x;
-        numtyp sw2_dvrc =sw2_ijparam.y;
-        numtyp sw2_big6w=sw2_ijparam.z;
-        numtyp sw2_heta =sw2_ijparam.w;
+        numtyp4 param2_ijparam; fetch4(param2_ijparam,ijparam,param2_tex);
+        numtyp param2_mbigd=param2_ijparam.x;
+        numtyp param2_dvrc =param2_ijparam.y;
+        numtyp param2_big6w=param2_ijparam.z;
+        numtyp param2_heta =param2_ijparam.w;
 
-        numtyp4 sw3_ijparam; fetch4(sw3_ijparam,ijparam,sw3_tex);
-        numtyp sw3_bigh=sw3_ijparam.x;
-        numtyp sw3_bigw=sw3_ijparam.y;
-        numtyp sw3_dvrc=sw3_ijparam.z;
-        numtyp sw3_c0  =sw3_ijparam.w;
+        numtyp4 param3_ijparam; fetch4(param3_ijparam,ijparam,param3_tex);
+        numtyp param3_bigh=param3_ijparam.x;
+        numtyp param3_bigw=param3_ijparam.y;
+        numtyp param3_dvrc=param3_ijparam.z;
+        numtyp param3_c0  =param3_ijparam.w;
 
         numtyp r=sqrt(rsq);
         numtyp rinvsq=1.0/rsq;
         numtyp r4inv = rinvsq*rinvsq;
         numtyp r6inv = rinvsq*r4inv;
 
-        numtyp reta = pow(r,-sw1_eta);
-        numtyp lam1r = r*sw1_lam1inv;
-        numtyp lam4r = r*sw1_lam4inv;
-        numtyp vc2 = sw1_zizj * exp(-lam1r)/r;
-        numtyp vc3 = sw2_mbigd * r4inv*exp(-lam4r);
+        numtyp reta = pow(r,-param1_eta);
+        numtyp lam1r = r*param1_lam1inv;
+        numtyp lam4r = r*param1_lam4inv;
+        numtyp vc2 = param1_zizj * exp(-lam1r)/r;
+        numtyp vc3 = param2_mbigd * r4inv*exp(-lam4r);
 
-        numtyp force = (sw2_dvrc*r
-            - (4.0*vc3 + lam4r*vc3+sw2_big6w*r6inv
-               - sw2_heta*reta - vc2 - lam1r*vc2)
+        numtyp force = (param2_dvrc*r
+            - (4.0*vc3 + lam4r*vc3+param2_big6w*r6inv
+               - param2_heta*reta - vc2 - lam1r*vc2)
             ) * rinvsq;
 
         f.x+=delx*force;
         f.y+=dely*force;
         f.z+=delz*force;
         if (eflag>0)
-          energy += (sw3_bigh*reta+vc2-vc3-sw3_bigw*r6inv-r*sw3_dvrc+sw3_c0);
+          energy += (param3_bigh*reta+vc2-vc3-param3_bigw*r6inv-r*param3_dvrc+param3_c0);
           
         if (vflag>0) {
           virial[0] += delx*delx*force;
@@ -254,32 +254,32 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
 {                                                                            \
   numtyp r1 = ucl_sqrt(rsq1);                                                \
   numtyp rinvsq1 = ucl_recip(rsq1);                                          \
-  numtyp rainv1 = ucl_recip(r1 - sw_r0_ij);                               \
-  numtyp gsrainv1 = sw_gamma_ij * rainv1;                                    \
+  numtyp rainv1 = ucl_recip(r1 - param_r0_ij);                               \
+  numtyp gsrainv1 = param_gamma_ij * rainv1;                                    \
   numtyp gsrainvsq1 = gsrainv1*rainv1/r1;                                    \
   numtyp expgsrainv1 = ucl_exp(gsrainv1);                                    \
                                                                              \
   numtyp r2 = ucl_sqrt(rsq2);                                                \
   numtyp rinvsq2 = ucl_recip(rsq2);                                          \
-  numtyp rainv2 = ucl_recip(r2 - sw_r0_ik);                               \
-  numtyp gsrainv2 = sw_gamma_ik * rainv2;                                    \
+  numtyp rainv2 = ucl_recip(r2 - param_r0_ik);                               \
+  numtyp gsrainv2 = param_gamma_ik * rainv2;                                    \
   numtyp gsrainvsq2 = gsrainv2*rainv2/r2;                                    \
   numtyp expgsrainv2 = ucl_exp(gsrainv2);                                    \
                                                                              \
   numtyp rinv12 = ucl_recip(r1*r2);                                          \
   numtyp cs = (delr1x*delr2x + delr1y*delr2y + delr1z*delr2z) * rinv12;      \
-  numtyp delcs = cs - sw_costheta_ijk;                                       \
+  numtyp delcs = cs - param_costheta_ijk;                                       \
   numtyp delcssq = delcs*delcs;                                              \
-  numtyp pcsinv = sw_bigc_ijk*delcssq+1.0;                                   \
+  numtyp pcsinv = param_bigc_ijk*delcssq+1.0;                                   \
   numtyp pcsinvsq = pcsinv*pcsinv;                                           \
   numtyp pcs = delcssq/pcsinv;                                               \
                                                                              \
   numtyp facexp = expgsrainv1*expgsrainv2;                                   \
                                                                              \
-  numtyp facrad = sw_bigb_ijk * facexp*pcs;                                  \
+  numtyp facrad = param_bigb_ijk * facexp*pcs;                                  \
   numtyp frad1 = facrad*gsrainvsq1;                                          \
   numtyp frad2 = facrad*gsrainvsq2;                                          \
-  numtyp facang = sw_big2b_ijk * facexp*delcs/pcsinvsq;                      \
+  numtyp facang = param_big2b_ijk * facexp*delcs/pcsinvsq;                      \
   numtyp facang12 = rinv12*facang;                                           \
   numtyp csfacang = cs*facang;                                               \
   numtyp csfac1 = rinvsq1*csfacang;                                          \
@@ -310,29 +310,29 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
 {                                                                            \
   numtyp r1 = ucl_sqrt(rsq1);                                                \
   numtyp rinvsq1 = ucl_recip(rsq1);                                          \
-  numtyp rainv1 = ucl_recip(r1 - sw_r0_ij);                               \
-  numtyp gsrainv1 = sw_gamma_ij * rainv1;                                    \
+  numtyp rainv1 = ucl_recip(r1 - param_r0_ij);                               \
+  numtyp gsrainv1 = param_gamma_ij * rainv1;                                    \
   numtyp gsrainvsq1 = gsrainv1*rainv1/r1;                                    \
   numtyp expgsrainv1 = ucl_exp(gsrainv1);                                    \
                                                                              \
   numtyp r2 = ucl_sqrt(rsq2);                                                \
-  numtyp rainv2 = ucl_recip(r2 - sw_r0_ik);                               \
-  numtyp gsrainv2 = sw_gamma_ik * rainv2;                                    \
+  numtyp rainv2 = ucl_recip(r2 - param_r0_ik);                               \
+  numtyp gsrainv2 = param_gamma_ik * rainv2;                                    \
   numtyp expgsrainv2 = ucl_exp(gsrainv2);                                    \
                                                                              \
   numtyp rinv12 = ucl_recip(r1*r2);                                          \
   numtyp cs = (delr1x*delr2x + delr1y*delr2y + delr1z*delr2z) * rinv12;      \
-  numtyp delcs = cs - sw_costheta_ijk;                                       \
+  numtyp delcs = cs - param_costheta_ijk;                                       \
   numtyp delcssq = delcs*delcs;                                              \
-  numtyp pcsinv = sw_bigc_ijk*delcssq+1.0;                                   \
+  numtyp pcsinv = param_bigc_ijk*delcssq+1.0;                                   \
   numtyp pcsinvsq = pcsinv*pcsinv;                                           \
   numtyp pcs = delcssq/pcsinv;                                               \
                                                                              \
   numtyp facexp = expgsrainv1*expgsrainv2;                                   \
                                                                              \
-  numtyp facrad = sw_bigb_ijk * facexp*pcs;                                  \
+  numtyp facrad = param_bigb_ijk * facexp*pcs;                                  \
   numtyp frad1 = facrad*gsrainvsq1;                                          \
-  numtyp facang = sw_big2b_ijk * facexp*delcs/pcsinvsq;                      \
+  numtyp facang = param_big2b_ijk * facexp*delcs/pcsinvsq;                      \
   numtyp facang12 = rinv12*facang;                                           \
   numtyp csfacang = cs*facang;                                               \
   numtyp csfac1 = rinvsq1*csfacang;                                          \
@@ -343,11 +343,11 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
 }
 
 __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
-                                const __global numtyp4 *restrict sw1,
-                                const __global numtyp4 *restrict sw2,
-                                const __global numtyp4 *restrict sw3,
-                                const __global numtyp4 *restrict sw4,
-                                const __global numtyp4 *restrict sw5,
+                                const __global numtyp4 *restrict param1,
+                                const __global numtyp4 *restrict param2,
+                                const __global numtyp4 *restrict param3,
+                                const __global numtyp4 *restrict param4,
+                                const __global numtyp4 *restrict param5,
                                 const __global int *restrict map,
                                 const __global int *restrict elem2param,
                                 const int nelements,
@@ -360,8 +360,8 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
                                 const int t_per_atom, const int evatom) {
   __local int tpa_sq, n_stride;
   tpa_sq=fast_mul(t_per_atom,t_per_atom);
-  numtyp sw_gamma_ij, sw_r0sq_ij, sw_r0_ij, sw_gamma_ik, sw_r0sq_ik, sw_r0_ik;
-  numtyp sw_costheta_ijk, sw_bigc_ijk, sw_bigb_ijk, sw_big2b_ijk;
+  numtyp param_gamma_ij, param_r0sq_ij, param_r0_ij, param_gamma_ik, param_r0sq_ik, param_r0_ik;
+  numtyp param_costheta_ijk, param_bigc_ijk, param_bigb_ijk, param_big2b_ijk;
 
   int tid, ii, offset;
   atom_info(tpa_sq,ii,tid,offset);
@@ -404,11 +404,11 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
 
       int ijparam=elem2param[itype*nelements*nelements+jtype*nelements+jtype];
       
-      numtyp4 sw4_ijparam; fetch4(sw4_ijparam,ijparam,sw4_tex);
-      sw_r0sq_ij=sw4_ijparam.x;
-      if (rsq1 > sw_r0sq_ij) continue;
-      sw_gamma_ij=sw4_ijparam.y;
-      sw_r0_ij=sw4_ijparam.w;
+      numtyp4 param4_ijparam; fetch4(param4_ijparam,ijparam,param4_tex);
+      param_r0sq_ij=param4_ijparam.x;
+      if (rsq1 > param_r0sq_ij) continue;
+      param_gamma_ij=param4_ijparam.y;
+      param_r0_ij=param4_ijparam.w;
       
       int nbor_k=nbor_j-offset_j+offset_k;
       if (nbor_k<=nbor_j)
@@ -422,24 +422,24 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
         int ktype=kx.w;
         ktype=map[ktype];
         int ikparam=elem2param[itype*nelements*nelements+ktype*nelements+ktype];
-        numtyp4 sw4_ikparam; fetch4(sw4_ikparam,ikparam,sw4_tex);
+        numtyp4 param4_ikparam; fetch4(param4_ikparam,ikparam,param4_tex);
 
         numtyp delr2x = kx.x-ix.x;
         numtyp delr2y = kx.y-ix.y;
         numtyp delr2z = kx.z-ix.z;
         numtyp rsq2 = delr2x*delr2x + delr2y*delr2y + delr2z*delr2z;
 
-        sw_r0sq_ik=sw4_ikparam.x;
-        if (rsq2 < sw_r0sq_ik) {
-          sw_gamma_ik=sw4_ikparam.y;
-          sw_r0_ik=sw4_ikparam.w;
+        param_r0sq_ik=param4_ikparam.x;
+        if (rsq2 < param_r0sq_ik) {
+          param_gamma_ik=param4_ikparam.y;
+          param_r0_ik=param4_ikparam.w;
 
           int ijkparam=elem2param[itype*nelements*nelements+jtype*nelements+ktype];
-          numtyp4 sw5_ijkparam; fetch4(sw5_ijkparam,ijkparam,sw5_tex);
-          sw_bigc_ijk=sw5_ijkparam.x;
-          sw_bigb_ijk=sw5_ijkparam.z;
-          sw_big2b_ijk=sw5_ijkparam.w;
-          sw_costheta_ijk=sw5_ijkparam.y;
+          numtyp4 param5_ijkparam; fetch4(param5_ijkparam,ijkparam,param5_tex);
+          param_bigc_ijk=param5_ijkparam.x;
+          param_bigb_ijk=param5_ijkparam.z;
+          param_big2b_ijk=param5_ijkparam.w;
+          param_costheta_ijk=param5_ijkparam.y;
 
           numtyp fjx, fjy, fjz, fkx, fky, fkz;
           threebody(delr1x,delr1y,delr1z,eflag,energy);
@@ -467,11 +467,11 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
 }
 
 __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
-                             const __global numtyp4 *restrict sw1,
-                             const __global numtyp4 *restrict sw2,
-                             const __global numtyp4 *restrict sw3,
-                             const __global numtyp4 *restrict sw4,
-                             const __global numtyp4 *restrict sw5,
+                             const __global numtyp4 *restrict param1,
+                             const __global numtyp4 *restrict param2,
+                             const __global numtyp4 *restrict param3,
+                             const __global numtyp4 *restrict param4,
+                             const __global numtyp4 *restrict param5,
                              const __global int *restrict map,
                              const __global int *restrict elem2param,
                              const int nelements,
@@ -485,8 +485,8 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
                              const int t_per_atom, const int gpu_nbor) {
   __local int tpa_sq, n_stride;
   tpa_sq=fast_mul(t_per_atom,t_per_atom);
-  numtyp sw_gamma_ij, sw_r0sq_ij, sw_r0_ij, sw_gamma_ik, sw_r0sq_ik, sw_r0_ik;
-  numtyp sw_costheta_ijk, sw_bigc_ijk, sw_bigb_ijk, sw_big2b_ijk;
+  numtyp param_gamma_ij, param_r0sq_ij, param_r0_ij, param_gamma_ik, param_r0sq_ik, param_r0_ik;
+  numtyp param_costheta_ijk, param_bigc_ijk, param_bigb_ijk, param_big2b_ijk;
 
   int tid, ii, offset;
   atom_info(tpa_sq,ii,tid,offset);
@@ -527,12 +527,12 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
       numtyp rsq1 = delr1x*delr1x+delr1y*delr1y+delr1z*delr1z;
 
       int ijparam=elem2param[itype*nelements*nelements+jtype*nelements+jtype];
-      numtyp4 sw4_ijparam; fetch4(sw4_ijparam,ijparam,sw4_tex);
-      sw_r0sq_ij = sw4_ijparam.x;
-      if (rsq1 > sw_r0sq_ij) continue;
+      numtyp4 param4_ijparam; fetch4(param4_ijparam,ijparam,param4_tex);
+      param_r0sq_ij = param4_ijparam.x;
+      if (rsq1 > param_r0sq_ij) continue;
 
-      sw_gamma_ij=sw4_ijparam.y;
-      sw_r0_ij = sw4_ijparam.w;
+      param_gamma_ij=param4_ijparam.y;
+      param_r0_ij = param4_ijparam.w;
       
       int nbor_k,numk;
       if (dev_nbor==dev_packed) {
@@ -566,19 +566,19 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
         numtyp delr2y = kx.y - jx.y;
         numtyp delr2z = kx.z - jx.z;
         numtyp rsq2 = delr2x*delr2x + delr2y*delr2y + delr2z*delr2z;
-        numtyp4 sw4_ikparam; fetch4(sw4_ikparam,ikparam,sw4_tex);
-        sw_r0sq_ik=sw4_ikparam.x;
+        numtyp4 param4_ikparam; fetch4(param4_ikparam,ikparam,param4_tex);
+        param_r0sq_ik=param4_ikparam.x;
 
-        if (rsq2 < sw_r0sq_ik) {
-          sw_gamma_ik=sw4_ikparam.y;
-          sw_r0_ik=sw4_ikparam.w;
+        if (rsq2 < param_r0sq_ik) {
+          param_gamma_ik=param4_ikparam.y;
+          param_r0_ik=param4_ikparam.w;
           
           int ijkparam=elem2param[jtype*nelements*nelements+itype*nelements+ktype]; //jik
-          numtyp4 sw5_ijkparam; fetch4(sw5_ijkparam,ijkparam,sw5_tex);
-          sw_bigc_ijk=sw5_ijkparam.x;
-          sw_costheta_ijk=sw5_ijkparam.y;
-          sw_bigb_ijk=sw5_ijkparam.z;
-          sw_big2b_ijk=sw5_ijkparam.w;
+          numtyp4 param5_ijkparam; fetch4(param5_ijkparam,ijkparam,param5_tex);
+          param_bigc_ijk=param5_ijkparam.x;
+          param_costheta_ijk=param5_ijkparam.y;
+          param_bigb_ijk=param5_ijkparam.z;
+          param_big2b_ijk=param5_ijkparam.w;
           
           numtyp fjx, fjy, fjz;
           //if (evatom==0) {
@@ -606,11 +606,11 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
 }
 
 __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
-                             const __global numtyp4 *restrict sw1,
-                             const __global numtyp4 *restrict sw2,
-                             const __global numtyp4 *restrict sw3,
-                             const __global numtyp4 *restrict sw4,
-                             const __global numtyp4 *restrict sw5,
+                             const __global numtyp4 *restrict param1,
+                             const __global numtyp4 *restrict param2,
+                             const __global numtyp4 *restrict param3,
+                             const __global numtyp4 *restrict param4,
+                             const __global numtyp4 *restrict param5,
                              const __global int *restrict map,
                              const __global int *restrict elem2param,
                              const int nelements,
@@ -624,8 +624,8 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
                              const int t_per_atom, const int gpu_nbor) {
   __local int tpa_sq, n_stride;
   tpa_sq=fast_mul(t_per_atom,t_per_atom);
-  numtyp sw_gamma_ij, sw_r0sq_ij, sw_r0_ij, sw_gamma_ik, sw_r0sq_ik, sw_r0_ik;
-  numtyp sw_costheta_ijk, sw_bigc_ijk, sw_bigb_ijk, sw_big2b_ijk;
+  numtyp param_gamma_ij, param_r0sq_ij, param_r0_ij, param_gamma_ik, param_r0sq_ik, param_r0_ik;
+  numtyp param_costheta_ijk, param_bigc_ijk, param_bigb_ijk, param_big2b_ijk;
 
   int tid, ii, offset;
   atom_info(tpa_sq,ii,tid,offset);
@@ -666,12 +666,12 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
       numtyp rsq1 = delr1x*delr1x+delr1y*delr1y+delr1z*delr1z;
 
       int ijparam=elem2param[itype*nelements*nelements+jtype*nelements+jtype];
-      numtyp4 sw4_ijparam; fetch4(sw4_ijparam,ijparam,sw4_tex);
-      sw_r0sq_ij=sw4_ijparam.x;
-      if (rsq1 > sw_r0sq_ij) continue;
+      numtyp4 param4_ijparam; fetch4(param4_ijparam,ijparam,param4_tex);
+      param_r0sq_ij=param4_ijparam.x;
+      if (rsq1 > param_r0sq_ij) continue;
 
-      sw_gamma_ij=sw4_ijparam.y;
-      sw_r0_ij=sw4_ijparam.w;
+      param_gamma_ij=param4_ijparam.y;
+      param_r0_ij=param4_ijparam.w;
       
       int nbor_k,numk;
       if (dev_nbor==dev_packed) {
@@ -700,24 +700,24 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
         int ktype=kx.w;
         ktype=map[ktype];
         int ikparam=elem2param[jtype*nelements*nelements+ktype*nelements+ktype]; // jk
-        numtyp4 sw4_ikparam; fetch4(sw4_ikparam,ikparam,sw4_tex);
+        numtyp4 param4_ikparam; fetch4(param4_ikparam,ikparam,param4_tex);
 
         numtyp delr2x = kx.x - jx.x;
         numtyp delr2y = kx.y - jx.y;
         numtyp delr2z = kx.z - jx.z;
         numtyp rsq2 = delr2x*delr2x + delr2y*delr2y + delr2z*delr2z;
-        sw_r0sq_ik=sw4_ikparam.x;
+        param_r0sq_ik=param4_ikparam.x;
 
-        if (rsq2 < sw_r0sq_ik) {
-          sw_gamma_ik=sw4_ikparam.y;
-          sw_r0_ik=sw4_ikparam.w;
+        if (rsq2 < param_r0sq_ik) {
+          param_gamma_ik=param4_ikparam.y;
+          param_r0_ik=param4_ikparam.w;
 
           int ijkparam=elem2param[jtype*nelements*nelements+itype*nelements+ktype]; // jik
-          numtyp4 sw5_ijkparam; fetch4(sw5_ijkparam,ijkparam,sw5_tex);
-          sw_bigc_ijk=sw5_ijkparam.x;
-          sw_costheta_ijk=sw5_ijkparam.y;
-          sw_bigb_ijk=sw5_ijkparam.z;
-          sw_big2b_ijk=sw5_ijkparam.w;
+          numtyp4 param5_ijkparam; fetch4(param5_ijkparam,ijkparam,param5_tex);
+          param_bigc_ijk=param5_ijkparam.x;
+          param_costheta_ijk=param5_ijkparam.y;
+          param_bigb_ijk=param5_ijkparam.z;
+          param_big2b_ijk=param5_ijkparam.w;
           
           numtyp fjx, fjy, fjz, fkx, fky, fkz;
           threebody(delr1x,delr1y,delr1z,eflag,energy);

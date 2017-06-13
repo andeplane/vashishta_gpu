@@ -68,22 +68,22 @@ class Vashishta : public BaseThree<numtyp, acctyp> {
   /// Number of atom types
   int _lj_types;
 
-  /// sw1.x = epsilon, sw1.y = sigma, sw1.z = lambda, sw1.w = gamma
-  UCL_D_Vec<numtyp4> sw1;
-  /// sw2.x = biga, sw2.y = bigb, sw2.z = powerp, sw2.w = powerq
-  UCL_D_Vec<numtyp4> sw2;
-  /// sw3.x = cut, sw3.y = cutsq, sw3.z = costheta
-  UCL_D_Vec<numtyp4> sw3;
-
-  UCL_D_Vec<numtyp4> sw4;
-
-  UCL_D_Vec<numtyp4> sw5;
+  /// param1.x = eta, param1.y = lam1inv, param1.z = lam4inv, param1.w = zizj
+  UCL_D_Vec<numtyp4> param1;
+  /// param2.x = mbigd, param2.y = dvrc, param2.z = big6w, param2.w = heta
+  UCL_D_Vec<numtyp4> param2;
+  /// param3.x = bigh, param3.y = bigw, param3.z = dvrc, param3.w = c0
+  UCL_D_Vec<numtyp4> param3;
+  /// param4.x = r0sq, param4.y = gamma, param4.z = cutsq, param4.w = r0
+  UCL_D_Vec<numtyp4> param4;
+  /// param5.x = bigc, param5.y = costheta, param5.z = bigb, param5.w = big2b
+  UCL_D_Vec<numtyp4> param5;
 
   UCL_D_Vec<int> elem2param;
   UCL_D_Vec<int> map;
   int _nparams,_nelements;
 
-  UCL_Texture sw1_tex, sw2_tex, sw3_tex, sw4_tex, sw5_tex;
+  UCL_Texture param1_tex, param2_tex, param3_tex, param4_tex, param5_tex;
 
  private:
   bool _allocated;

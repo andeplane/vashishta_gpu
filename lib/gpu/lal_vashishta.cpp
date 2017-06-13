@@ -9,8 +9,8 @@
     This file is part of the LAMMPS Accelerator Library (LAMMPS_AL)
  __________________________________________________________________________
 
-    begin                : Tue March 26, 2013
-    email                : brownw@ornl.gov
+    begin                : Mon June 12, 2017
+    email                : andershaf@gmail.com
  ***************************************************************************/
 
 #if defined(USE_OPENCL)
@@ -87,7 +87,7 @@ int VashishtaT::init(const int ntypes, const int nlocal, const int nall, const i
   }
 
   // pack coefficients into arrays
-  sw1.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
+  param1.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
 
   for (int i=0; i<nparams; i++) {
     dview[i].x=static_cast<numtyp>(eta[i]);
@@ -96,11 +96,11 @@ int VashishtaT::init(const int ntypes, const int nlocal, const int nall, const i
     dview[i].w=static_cast<numtyp>(zizj[i]);
   }
 
-  ucl_copy(sw1,dview,false);
-  sw1_tex.get_texture(*(this->pair_program),"sw1_tex");
-  sw1_tex.bind_float(sw1,4);
+  ucl_copy(param1,dview,false);
+  param1_tex.get_texture(*(this->pair_program),"param1_tex");
+  param1_tex.bind_float(param1,4);
 
-  sw2.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
+  param2.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
 
   for (int i=0; i<nparams; i++) {
     dview[i].x=static_cast<numtyp>(mbigd[i]);
@@ -109,25 +109,24 @@ int VashishtaT::init(const int ntypes, const int nlocal, const int nall, const i
     dview[i].w=static_cast<numtyp>(heta[i]);
   }
 
-  ucl_copy(sw2,dview,false);
-  sw2_tex.get_texture(*(this->pair_program),"sw2_tex");
-  sw2_tex.bind_float(sw2,4);
+  ucl_copy(param2,dview,false);
+  param2_tex.get_texture(*(this->pair_program),"param2_tex");
+  param2_tex.bind_float(param2,4);
 
-  sw3.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
+  param3.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
 
   for (int i=0; i<nparams; i++) {
     dview[i].x=static_cast<numtyp>(bigh[i]);
     dview[i].y=static_cast<numtyp>(bigw[i]);
     dview[i].z=static_cast<numtyp>(dvrc[i]);
     dview[i].w=static_cast<numtyp>(c0[i]);
-    // dview[i].w=(numtyp)0;
   }
 
-  ucl_copy(sw3,dview,false);
-  sw3_tex.get_texture(*(this->pair_program),"sw3_tex");
-  sw3_tex.bind_float(sw3,4);
+  ucl_copy(param3,dview,false);
+  param3_tex.get_texture(*(this->pair_program),"param3_tex");
+  param3_tex.bind_float(param3,4);
 
-  sw4.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
+  param4.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
 
   for (int i=0; i<nparams; i++) {
     double r0sq = r0[i]*r0[i]-1e-4; // TODO: should we have the 1e-4?
@@ -138,11 +137,11 @@ int VashishtaT::init(const int ntypes, const int nlocal, const int nall, const i
     dview[i].w=static_cast<numtyp>(r0[i]);
   }
 
-  ucl_copy(sw4,dview,false);
-  sw4_tex.get_texture(*(this->pair_program),"sw4_tex");
-  sw4_tex.bind_float(sw4,4);
+  ucl_copy(param4,dview,false);
+  param4_tex.get_texture(*(this->pair_program),"param4_tex");
+  param4_tex.bind_float(param4,4);
 
-  sw5.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
+  param5.alloc(nparams,*(this->ucl_device),UCL_READ_ONLY);
 
   for (int i=0; i<nparams; i++) {
     dview[i].x=static_cast<numtyp>(bigc[i]);
@@ -151,9 +150,9 @@ int VashishtaT::init(const int ntypes, const int nlocal, const int nall, const i
     dview[i].w=static_cast<numtyp>(big2b[i]);
   }
 
-  ucl_copy(sw5,dview,false);
-  sw5_tex.get_texture(*(this->pair_program),"sw5_tex");
-  sw5_tex.bind_float(sw5,4);
+  ucl_copy(param5,dview,false);
+  param5_tex.get_texture(*(this->pair_program),"param5_tex");
+  param5_tex.bind_float(param5,4);
 
   UCL_H_Vec<int> dview_elem2param(nelements*nelements*nelements,
                            *(this->ucl_device), UCL_WRITE_ONLY);
@@ -178,7 +177,7 @@ int VashishtaT::init(const int ntypes, const int nlocal, const int nall, const i
   ucl_copy(map,dview_map,false);
 
   _allocated=true;
-  this->_max_bytes=sw1.row_bytes()+sw2.row_bytes()+sw3.row_bytes()+sw4.row_bytes()+sw5.row_bytes()+
+  this->_max_bytes=param1.row_bytes()+param2.row_bytes()+param3.row_bytes()+param4.row_bytes()+param5.row_bytes()+
     map.row_bytes()+elem2param.row_bytes();
   return 0;
 }
@@ -189,11 +188,11 @@ void VashishtaT::clear() {
     return;
   _allocated=false;
 
-  sw1.clear();
-  sw2.clear();
-  sw3.clear();
-  sw4.clear();
-  sw5.clear();
+  param1.clear();
+  param2.clear();
+  param3.clear();
+  param4.clear();
+  param5.clear();
   map.clear();
   elem2param.clear();
   this->clear_atomic();
@@ -234,7 +233,7 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   this->time_pair.start();
 
   this->k_pair.set_size(GX,BX);
-  this->k_pair.run(&this->atom->x, &sw1, &sw2, &sw3, &sw4, &sw5,
+  this->k_pair.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                    &map, &elem2param, &_nelements,
                    &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                    &this->ans->force, &this->ans->engv,
@@ -246,7 +245,7 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
                            (BX/(KTHREADS*JTHREADS))));
   
   this->k_three_center.set_size(GX,BX);
-  this->k_three_center.run(&this->atom->x, &sw1, &sw2, &sw3, &sw4, &sw5,
+  this->k_three_center.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                            &map, &elem2param, &_nelements,
                            &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                            &this->ans->force, &this->ans->engv, &eflag, &vflag, &ainum,
@@ -260,7 +259,7 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   if (evatom!=0) {
     
     this->k_three_end_vatom.set_size(GX,BX);
-    this->k_three_end_vatom.run(&this->atom->x, &sw1, &sw2, &sw3, &sw4, &sw5,
+    this->k_three_end_vatom.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                           &map, &elem2param, &_nelements,
                           &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                           &this->nbor->dev_acc,
@@ -269,7 +268,7 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   } else {
     
     this->k_three_end.set_size(GX,BX);
-    this->k_three_end.run(&this->atom->x, &sw1, &sw2, &sw3, &sw4, &sw5,
+    this->k_three_end.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                           &map, &elem2param, &_nelements,
                           &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                           &this->nbor->dev_acc,
