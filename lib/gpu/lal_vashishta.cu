@@ -3,7 +3,7 @@
 //                             -------------------
 //                           Anders Hafreager (UiO)
 //
-//  Device code for acceleration of the sw pair style
+//  Device code for acceleration of the vashishta pair style
 //
 // __________________________________________________________________________
 //    This file is part of the LAMMPS Accelerator Library (LAMMPS_AL)
