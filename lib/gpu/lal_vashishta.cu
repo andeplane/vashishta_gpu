@@ -170,14 +170,15 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
   __syncthreads();
 
   if (ii<inum) {
-    __global int *neigh_counts, *neigh_list;
-    neigh_counts = dev_numj_short + ii;
-    neigh_list = dev_nbor_short + ii*inum;
     int cnt = 0;
     int nbor, nbor_end;
     int i, numj;
     nbor_info(dev_nbor,dev_packed,nbor_pitch,t_per_atom,ii,offset,i,numj,
               n_stride,nbor_end,nbor);
+
+    __global int *neigh_counts, *neigh_list;
+    neigh_counts = dev_numj_short + i;
+    neigh_list = dev_nbor_short + i*inum;
 
     // printf("tid %d has ii=%d (i=%d), inum=%d and neigh_list=%d\n", tid, ii, i, inum, neigh_list);
     numtyp4 ix; fetch4(ix,i,pos_tex); //x_[i];
@@ -203,7 +204,7 @@ __kernel void k_vashishta(const __global numtyp4 *restrict x_,
       numtyp rsq = delx*delx+dely*dely+delz*delz;
 
       if (rsq<8.41) {
-        // printf("Atom %d which has index %d: Adding neighbor %d with index %d since distance is %f\n", ii, i, cnt, j, rsq);
+        // printf("00 Atom %d which has index %d: Adding neighbor %d with index %d since distance is %f\n", ii, i, cnt, j, rsq);
         *neigh_list = j;
         neigh_list++;
         cnt++;
@@ -413,18 +414,16 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
     itype=map[itype];
 
     __global int *neigh_counts, *neigh_list;
-    neigh_counts = dev_numj_short + ii;
-    neigh_list = dev_nbor_short + ii*inum;
-    nbor_j = 0;
-    nbor_end = *neigh_counts;
-    // printf("Atom %d has %d neighbors\n", i, nbor_end);
-    for ( ; nbor_j<nbor_end; nbor_j+=n_stride) {
-  // for ( ; nbor_j<nbor_end; nbor_j+=n_stride) {
-
-      // int j=dev_packed[nbor_j];
+    neigh_counts = dev_numj_short + i;
+    neigh_list = dev_nbor_short + i*inum;
+    
+    int numshort = *neigh_counts;
+    int jnumm1 = numshort - 1;
+    // printf("11 Atom %d has %d neighbors\n", i, jnumm1);
+    for (int nbor_j = 0; nbor_j<jnumm1; nbor_j+=1) {
       int j=neigh_list[nbor_j];
-      j &= NEIGHMASK;
-
+      // printf("22 Pair %d, %d\n", i, j);
+      
       numtyp4 jx; fetch4(jx,j,pos_tex); //x_[j];
       int jtype=jx.w;
       jtype=map[jtype];
@@ -443,17 +442,10 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
       param_gamma_ij=param4_ijparam.y;
       param_r0_ij=param4_ijparam.w;
       
-      // int nbor_k=nbor_j-offset_j+offset_k;
-      // if (nbor_k<=nbor_j)
-      //   nbor_k+=n_stride;
-      int nbor_k=nbor_j+1;
-      
-      for ( ; nbor_k<nbor_end; nbor_k+=n_stride) {
-        // int k=dev_packed[nbor_k];
+      for (int nbor_k=nbor_j+1; nbor_k<numshort; nbor_k+=1) {
         int k=neigh_list[nbor_k];
-        k &= NEIGHMASK;
-        // printf("Force between %d, %d, %d\n", i, j, k);
-
+        // printf("33 Triplet %d, %d, %d\n", i,j,k);
+        
         numtyp4 kx; fetch4(kx,k,pos_tex);
         int ktype=kx.w;
         ktype=map[ktype];
@@ -467,6 +459,7 @@ __kernel void k_vashishta_three_center(const __global numtyp4 *restrict x_,
 
         param_r0sq_ik=param4_ikparam.x;
         if (rsq2 < param_r0sq_ik) {
+          // printf("Force between %d, %d, %d with r_ij=%f, r_ik=%f\n", i,j,k, rsq1, rsq2);
           param_gamma_ik=param4_ikparam.y;
           param_r0_ik=param4_ikparam.w;
 
@@ -551,16 +544,13 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
     itype=map[itype];
 
     __global int *neigh_counts, *neigh_list;
-    neigh_counts = dev_numj_short + ii;
-    neigh_list = dev_nbor_short + ii*inum;
-    nbor_j = 0;
-    nbor_end = *neigh_counts;
-    for ( ; nbor_j<nbor_end; nbor_j+=n_stride) {
-    // for ( ; nbor_j<nbor_end; nbor_j+=n_stride) {
-      // int j=dev_packed[nbor_j];
+    neigh_counts = dev_numj_short + i;
+    neigh_list = dev_nbor_short + i*inum;
+    
+    int numshort = *neigh_counts;
+    // printf("11 Atom %d has %d neighbors\n", i, jnumm1);
+    for (int nbor_j = 0; nbor_j<numshort; nbor_j+=1) {
       int j=neigh_list[nbor_j];
-      j &= NEIGHMASK;
-
       numtyp4 jx; fetch4(jx,j,pos_tex); //x_[j];
       int jtype=jx.w;
       jtype=map[jtype];
@@ -578,37 +568,15 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
 
       param_gamma_ij=param4_ijparam.y;
       param_r0_ij = param4_ijparam.w;
+
+      __global int *neigh_counts_j = dev_numj_short + j;
+      __global int *neigh_list_j = dev_nbor_short + j*inum;
+      int numshort_j = *neigh_counts_j;
       
-      int nbor_k,numk;
-      if (dev_nbor==dev_packed) {
-        // if (gpu_nbor) nbor_k=j+nbor_pitch;
-        // else nbor_k=dev_acc[j]+nbor_pitch;
-        // numk=dev_nbor[nbor_k];
-        // nbor_k+=nbor_pitch+fast_mul(j,t_per_atom-1);
-        // k_end=nbor_k+fast_mul(numk/t_per_atom,n_stride)+(numk & (t_per_atom-1));
-        // nbor_k+=offset_k;
-        nbor_k=nbor_j+n_stride;
-        numk=*neigh_counts;
-        k_end=numk;
-      } else {
-        // nbor_k=dev_acc[j]+nbor_pitch;
-        // numk=dev_nbor[nbor_k];
-        // nbor_k+=nbor_pitch;
-        // nbor_k=dev_nbor[nbor_k];
-        // k_end=nbor_k+numk;
-        // nbor_k+=offset_k;
-        // nbor_k=nbor_j+n_stride;
-        nbor_k=nbor_j+n_stride;
-        numk=*neigh_counts;
-        k_end=numk;
-      }
+      for (int nbor_k=0; nbor_k<numshort_j; nbor_k+=1) {
+        int k=neigh_list_j[nbor_k];
 
-      for ( ; nbor_k<nbor_end; nbor_k+=n_stride) {
-        // int k=dev_packed[nbor_k];
-        int k=neigh_list[nbor_k];
-        k &= NEIGHMASK;
-
-        // if (k == i) continue;
+        if (k == i) continue;
 
         numtyp4 kx; fetch4(kx,k,pos_tex);
         int ktype=kx.w;
@@ -709,14 +677,10 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
     __global int *neigh_counts, *neigh_list;
     neigh_counts = dev_numj_short + ii;
     neigh_list = dev_nbor_short + ii*inum;
-    nbor_j = 0;
-    nbor_end = *neigh_counts;
-    for ( ; nbor_j<nbor_end; nbor_j+=n_stride) {
-    // for ( ; nbor_j<nbor_end; nbor_j+=n_stride) {
-      // int j=dev_packed[nbor_j];
+    int numshort = *neigh_counts;
+    for (int nbor_j = 0; nbor_j<numshort; nbor_j+=1) {
       int j=neigh_list[nbor_j];
-      j &= NEIGHMASK;
-
+      
       numtyp4 jx; fetch4(jx,j,pos_tex); //x_[j];
       int jtype=jx.w;
       jtype=map[jtype];
@@ -735,35 +699,10 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
       param_gamma_ij=param4_ijparam.y;
       param_r0_ij=param4_ijparam.w;
       
-      int nbor_k,numk;
-      if (dev_nbor==dev_packed) {
-        // if (gpu_nbor) nbor_k=j+nbor_pitch;
-        // else nbor_k=dev_acc[j]+nbor_pitch;
-        // numk=dev_nbor[nbor_k];
-        // nbor_k+=nbor_pitch+fast_mul(j,t_per_atom-1);
-        // k_end=nbor_k+fast_mul(numk/t_per_atom,n_stride)+(numk & (t_per_atom-1));
-        // nbor_k+=offset_k;
-        nbor_k=nbor_j+n_stride;
-        numk=*neigh_counts;
-        k_end=numk;
-      } else {
-        // nbor_k=dev_acc[j]+nbor_pitch;
-        // numk=dev_nbor[nbor_k];
-        // nbor_k+=nbor_pitch;
-        // nbor_k=dev_nbor[nbor_k];
-        // k_end=nbor_k+numk;
-        // nbor_k+=offset_k;
-        nbor_k=nbor_j+n_stride;
-        numk=*neigh_counts;
-        k_end=numk;
-      }
-
-      for ( ; nbor_k<nbor_end; nbor_k+=n_stride) {
-        // int k=dev_packed[nbor_k];
+      for (int nbor_k = 0; nbor_k<numshort; nbor_k+=1) {
         int k=neigh_list[nbor_k];
-        k &= NEIGHMASK;
-
-        // if (k == i) continue;
+        
+        if (k == i) continue;
 
         numtyp4 kx; fetch4(kx,k,pos_tex);
         int ktype=kx.w;

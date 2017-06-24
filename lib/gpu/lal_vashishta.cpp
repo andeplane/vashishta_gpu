@@ -249,7 +249,7 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   BX=this->block_size();
   GX=static_cast<int>(ceil(static_cast<double>(this->ans->inum())/
                            (BX/(KTHREADS*JTHREADS))));
-  
+    
   this->k_three_center.set_size(GX,BX);
   this->k_three_center.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                            &map, &elem2param, &_nelements,
@@ -264,6 +264,7 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   #else
   end_ans=this->ans;
   #endif
+  
   if (evatom!=0) {
     this->k_three_end_vatom.set_size(GX,BX);
     this->k_three_end_vatom.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
