@@ -232,14 +232,20 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   int nbor_pitch=this->nbor->nbor_pitch();
   this->time_pair.start();
 
+  this->update_short_nborlist(ainum);
+
   this->k_pair.set_size(GX,BX);
+  double rsq_3body = 8.41;
   this->k_pair.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                    &map, &elem2param, &_nelements,
                    &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                    &this->ans->force, &this->ans->engv,
                    &eflag, &vflag, &ainum, &nbor_pitch,
-                   &this->_threads_per_atom);
-
+                   &this->_threads_per_atom,
+                   &this->dev_nbor_short, &this->dev_numjshort,
+                   &rsq_3body
+                   );
+  
   BX=this->block_size();
   GX=static_cast<int>(ceil(static_cast<double>(this->ans->inum())/
                            (BX/(KTHREADS*JTHREADS))));
@@ -249,7 +255,9 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
                            &map, &elem2param, &_nelements,
                            &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                            &this->ans->force, &this->ans->engv, &eflag, &vflag, &ainum,
-                           &nbor_pitch, &this->_threads_per_atom, &evatom);
+                           &nbor_pitch, &this->_threads_per_atom, &evatom,
+                           &this->dev_nbor_short, &this->dev_numjshort);
+
   Answer<numtyp,acctyp> *end_ans;
   #ifdef THREE_CONCURRENT
   end_ans=this->ans2;
@@ -257,25 +265,25 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   end_ans=this->ans;
   #endif
   if (evatom!=0) {
-    
     this->k_three_end_vatom.set_size(GX,BX);
     this->k_three_end_vatom.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                           &map, &elem2param, &_nelements,
                           &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                           &this->nbor->dev_acc,
                           &end_ans->force, &end_ans->engv, &eflag, &vflag, &ainum,
-                          &nbor_pitch, &this->_threads_per_atom, &this->_gpu_nbor);
+                          &nbor_pitch, &this->_threads_per_atom, &this->_gpu_nbor,
+                          &this->dev_nbor_short, &this->dev_numjshort);
   } else {
-    
     this->k_three_end.set_size(GX,BX);
     this->k_three_end.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                           &map, &elem2param, &_nelements,
                           &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                           &this->nbor->dev_acc,
                           &end_ans->force, &end_ans->engv, &eflag, &vflag, &ainum,
-                          &nbor_pitch, &this->_threads_per_atom, &this->_gpu_nbor);
+                          &nbor_pitch, &this->_threads_per_atom, &this->_gpu_nbor,
+                          &this->dev_nbor_short, &this->dev_numjshort);
   }
-
+  
   this->time_pair.stop();
 }
 

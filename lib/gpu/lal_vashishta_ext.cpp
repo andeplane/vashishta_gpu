@@ -18,10 +18,6 @@
 #include <math.h>
 
 #include "lal_vashishta.h"
-#include <iostream>
-using namespace std;
-
-using namespace std;
 using namespace LAMMPS_AL;
 
 static Vashishta<PRECISION,ACC_PRECISION> VashishtaMF;
@@ -67,7 +63,7 @@ int vashishta_gpu_init(const int ntypes, const int inum, const int nall, const i
 
   int init_ok=0;
   if (world_me==0)
-    init_ok=VashishtaMF.init(ntypes, inum, nall, 500, cell_size, gpu_split, screen,
+    init_ok=VashishtaMF.init(ntypes, inum, nall, 300, cell_size, gpu_split, screen,
                       host_map, nelements, host_elem2param, nparams,
                       cutsq, r0, gamma, eta, lam1inv, 
                       lam4inv, zizj, mbigd, dvrc, big6w, heta, bigh, bigw, 
@@ -87,7 +83,7 @@ int vashishta_gpu_init(const int ntypes, const int inum, const int nall, const i
       fflush(screen);
     }
     if (gpu_rank==i && world_me!=0)
-      init_ok=VashishtaMF.init(ntypes, inum, nall, 500, cell_size, gpu_split, screen,
+      init_ok=VashishtaMF.init(ntypes, inum, nall, 300, cell_size, gpu_split, screen,
                         host_map, nelements, host_elem2param, nparams,
                         cutsq, r0, gamma, eta, lam1inv, 
                         lam4inv, zizj, mbigd, dvrc, big6w, heta, bigh, bigw, 
@@ -103,7 +99,6 @@ int vashishta_gpu_init(const int ntypes, const int inum, const int nall, const i
   if (init_ok==0)
     VashishtaMF.estimate_gpu_overhead();
 
-  cout << "Seems like this was ok!" << endl;
   return init_ok;
 }
 
