@@ -12,6 +12,8 @@
     begin                : Mon June 12, 2017
     email                : andershaf@gmail.com
  ***************************************************************************/
+#include <iostream>
+using namespace std;
 
 #if defined(USE_OPENCL)
 #include "vashishta_cl.h"
@@ -235,21 +237,18 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   this->update_short_nborlist(ainum);
 
   this->k_pair.set_size(GX,BX);
-  double rsq_3body = 8.41;
   this->k_pair.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                    &map, &elem2param, &_nelements,
                    &this->nbor->dev_nbor, &this->_nbor_data->begin(),
                    &this->ans->force, &this->ans->engv,
                    &eflag, &vflag, &ainum, &nbor_pitch,
                    &this->_threads_per_atom,
-                   &this->dev_nbor_short, &this->dev_numjshort,
-                   &rsq_3body
+                   &this->dev_nbor_short, &this->dev_numjshort
                    );
   
   BX=this->block_size();
   GX=static_cast<int>(ceil(static_cast<double>(this->ans->inum())/
                            (BX/(KTHREADS*JTHREADS))));
-    
   this->k_three_center.set_size(GX,BX);
   this->k_three_center.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                            &map, &elem2param, &_nelements,
@@ -265,6 +264,8 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   end_ans=this->ans;
   #endif
   
+  /*
+  cout << "Will run 3 body end" << endl;
   if (evatom!=0) {
     this->k_three_end_vatom.set_size(GX,BX);
     this->k_three_end_vatom.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
@@ -284,7 +285,8 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
                           &nbor_pitch, &this->_threads_per_atom, &this->_gpu_nbor,
                           &this->dev_nbor_short, &this->dev_numjshort);
   }
-  
+  cout << "Did run 3 body end" << endl;
+  */
   this->time_pair.stop();
 }
 
