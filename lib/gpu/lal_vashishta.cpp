@@ -233,9 +233,8 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   int ainum=this->ans->inum();
   int nbor_pitch=this->nbor->nbor_pitch();
   this->time_pair.start();
-
   this->update_short_nborlist(ainum);
-
+  
   this->k_pair.set_size(GX,BX);
   this->k_pair.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
                    &map, &elem2param, &_nelements,
@@ -264,8 +263,6 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
   end_ans=this->ans;
   #endif
   
-  /*
-  cout << "Will run 3 body end" << endl;
   if (evatom!=0) {
     this->k_three_end_vatom.set_size(GX,BX);
     this->k_three_end_vatom.run(&this->atom->x, &param1, &param2, &param3, &param4, &param5,
@@ -285,8 +282,7 @@ void VashishtaT::loop(const bool _eflag, const bool _vflag, const int evatom) {
                           &nbor_pitch, &this->_threads_per_atom, &this->_gpu_nbor,
                           &this->dev_nbor_short, &this->dev_numjshort);
   }
-  cout << "Did run 3 body end" << endl;
-  */
+  
   this->time_pair.stop();
 }
 

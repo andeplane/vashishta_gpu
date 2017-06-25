@@ -113,13 +113,14 @@ int BaseThreeT::init_three(const int nlocal, const int nall,
   _max_an_bytes+=ans2->gpu_bytes();
   #endif
 
-  num_short_allocated = 100;
+  num_short_allocated = 20000;
   success=(dev_numjshort.alloc(num_short_allocated,*(this->ucl_device), UCL_READ_WRITE));
   if (success!=0) {
      cout << "No success with numshort..." << endl;
      return success;
   }
-  success=(dev_nbor_short.alloc(num_short_allocated*max_nbors,*(this->ucl_device), UCL_READ_WRITE));
+  cout << "Will allocate for " << num_short_allocated*300 << endl;
+  success=(dev_nbor_short.alloc(num_short_allocated*300,*(this->ucl_device), UCL_READ_WRITE));
   if (success!=0) {
      cout << "No success with short..." << endl;
      return success;
@@ -376,23 +377,24 @@ void BaseThreeT::compile_kernels(UCL_Device &dev, const void *pair_str,
 
 template <class numtyp, class acctyp>
 void BaseThreeT::update_short_nborlist(int natoms) {
-  if(num_short_allocated < natoms) {
-    cout << "Will update size of short lists..." << endl;
+  int needed = 2*natoms;
+  int max_nbors = 300;
+  // nbor->max_nbors()
+  if(num_short_allocated < needed) {
     dev_nbor_short.clear();
     dev_numjshort.clear();
-    num_short_allocated = natoms;
+    num_short_allocated = needed;
     
     int success=(dev_numjshort.alloc(num_short_allocated,*(this->ucl_device), UCL_READ_WRITE));
     if (success!=0) {
       cout << "Error when allocating dev_numjshort" << endl;
       exit(1);
     }
-    success=(dev_nbor_short.alloc(num_short_allocated*nbor->max_nbors(),*(this->ucl_device), UCL_READ_WRITE));
+    success=(dev_nbor_short.alloc(num_short_allocated*max_nbors,*(this->ucl_device), UCL_READ_WRITE));
     if (success!=0) {
       cout << "Error when allocating dev_nbor_short" << endl;
       exit(1);
     }
-    cout << "Did update size to " << num_short_allocated << " with max nbors: " << nbor->max_nbors() << endl;
   }
 }
 
