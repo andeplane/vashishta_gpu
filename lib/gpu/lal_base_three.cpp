@@ -113,7 +113,7 @@ int BaseThreeT::init_three(const int nlocal, const int nall,
   _max_an_bytes+=ans2->gpu_bytes();
   #endif
 
-  num_short_allocated = 20000;
+  num_short_allocated = 100;
   success=(dev_numjshort.alloc(num_short_allocated,*(this->ucl_device), UCL_READ_WRITE));
   if (success!=0) {
      cout << "No success with numshort..." << endl;
