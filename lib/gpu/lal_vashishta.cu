@@ -523,7 +523,8 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
     int jnum = dev_numj_short[i];
     for (nbor_j = 0; nbor_j<jnum; nbor_j+=1) {
       int j=neigh_list_i[nbor_j];
-      if(j>=8000) continue;
+      // printf("FullB pair %d, %d\n", i, j);
+      if(j>=inum) continue;
       numtyp4 jx; fetch4(jx,j,pos_tex); //x_[j];
       int jtype=jx.w;
       jtype=map[jtype];
@@ -548,7 +549,7 @@ __kernel void k_vashishta_three_end(const __global numtyp4 *restrict x_,
         int k=neigh_list_j[nbor_k];
 
         if (k == i) continue;
-
+        // printf("FullB triplet %d, %d, %d\n", i, j, k);
         numtyp4 kx; fetch4(kx,k,pos_tex);
         int ktype=kx.w;
         ktype=map[ktype];
@@ -649,7 +650,8 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
     int jnum = dev_numj_short[i];
     for (nbor_j = 0; nbor_j<jnum; nbor_j+=1) {
       int j=neigh_list_i[nbor_j];
-      if(j>=8000) continue;
+      // printf("FullB pair %d, %d\n", i, j);
+      if(j>=inum) continue;
       numtyp4 jx; fetch4(jx,j,pos_tex); //x_[j];
       int jtype=jx.w;
       jtype=map[jtype];
@@ -672,9 +674,8 @@ __kernel void k_vashishta_three_end_vatom(const __global numtyp4 *restrict x_,
       int j_jnum = dev_numj_short[j];
       for (int nbor_k = 0; nbor_k<j_jnum; nbor_k+=1) {
         int k=neigh_list_j[nbor_k];
-
         if (k == i) continue;
-
+        // printf("FullB triplet %d, %d, %d\n", i, j, k);
         numtyp4 kx; fetch4(kx,k,pos_tex);
         int ktype=kx.w;
         ktype=map[ktype];
